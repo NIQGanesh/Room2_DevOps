@@ -1,12 +1,14 @@
-#!/bin/bash
-
-# Deployment script
-echo "Starting deployment of Sample Web App..."
-
-# Simulate a build check that fails on certain configurations
-if grep -q "enable_logs: false" config/config.yml; then
-    echo "Error: Deployment failed due to logging configuration."
-    exit 1
-fi
-
-echo "Deployment successful!"
+deploy:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+ 
+      - name: Update config for deployment
+        run: |
+          sed -i 's/enable_logs: false/enable_logs: true/' config.yaml
+          sed -i 's/localhost/0.0.0.0/' config.yaml
+ 
+      - name: Deploy application
+        run: ./script/deploy
